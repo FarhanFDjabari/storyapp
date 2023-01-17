@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="splash_icon_description">Splash Icon</string>
+    <string name="welcome_story_teller">Welcome, Story Teller!</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="btn_login">Login</string>
+    <string name="btn_register">Register</string>
+    <string name="register_story_teller">Create New Account</string>
+    <string name="hint_name">Name</string>
+    <string name="story_item_thumbnail">Story Item Thumbnail</string>
+    <string name="thumbnail_preview">Thumbnail Preview</string>
+    <string name="btn_camera">Camera</string>
+    <string name="btn_gallery">Gallery</string>
+    <string name="hint_description">Description</string>
+    <string name="btn_upload">Upload</string>
+    <string name="story_image">Story Image</string>
+    <string name="preference_auth_token">auth_token</string>
+    <string name="register_here">Don\'t have account? Register here</string>
+    <string name="login_here">Already have account? Login here</string>
+    <string name="add_new_story_floating_button">Add New Story Floating Button</string>
+    <string name="tooltip_add_new_story">Add New Story</string>
+    <string name="logout">Logout</string>
+</resources>

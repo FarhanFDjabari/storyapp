@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_marginVertical="10dp"
+    android:layout_marginHorizontal="16dp"
+    app:cardCornerRadius="10dp"
+    android:layout_height="220dp">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <androidx.constraintlayout.utils.widget.ImageFilterView
+            android:id="@+id/iv_thumbnail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/story_item_thumbnail"
+            android:scaleType="centerCrop"
+            android:src="@drawable/sample_thumbnail"
+            app:brightness="0.85"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.5"
+            app:saturation="0.9" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="95dp"
+            android:layout_gravity="bottom"
+            android:padding="16dp"
+            android:background="@color/teal_700"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/tv_username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/app_name"
+                android:textColor="@color/white"
+                android:background="@drawable/rounded_edit_text"
+                android:backgroundTint="@color/black_50"
+                android:paddingHorizontal="10dp"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:maxWidth="200dp"
+                android:textSize="14sp"/>
+
+            <TextView
+                android:id="@+id/tv_description"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/hint_email"
+                android:textColor="@color/white"
+                android:gravity="center_vertical"
+                android:textSize="18sp"
+                android:ellipsize="end"
+                android:maxLines="2"/>
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</androidx.cardview.widget.CardView>
