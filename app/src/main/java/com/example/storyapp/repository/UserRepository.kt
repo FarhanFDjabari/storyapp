@@ -1,8 +1,6 @@
 package com.example.storyapp.repository
 
-import android.content.Context
 import android.util.Log
-import com.example.storyapp.R
 import com.example.storyapp.data.model.request.LoginRequest
 import com.example.storyapp.data.model.request.RegisterRequest
 import com.example.storyapp.data.services.local.UserPreference
@@ -10,7 +8,6 @@ import com.example.storyapp.data.services.remote.ApiServices
 import kotlinx.coroutines.Dispatchers
 
 class UserRepository private constructor(
-    private val context: Context,
     private val apiServices: ApiServices,
     private val pref: UserPreference
 ) {
@@ -91,10 +88,10 @@ class UserRepository private constructor(
         @Volatile
         private var instance: UserRepository? = null
 
-        fun getInstance(context: Context, apiServices: ApiServices, pref: UserPreference): UserRepository {
+        fun getInstance(apiServices: ApiServices, pref: UserPreference): UserRepository {
             if (instance == null) {
                 synchronized(this) {
-                    instance = UserRepository(context.applicationContext, apiServices, pref)
+                    instance = UserRepository(apiServices, pref)
                 }
             }
             return instance as UserRepository

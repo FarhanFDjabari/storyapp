@@ -5,6 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.example.storyapp.data.model.Story
 import com.example.storyapp.repository.StoryRepository
 import com.example.storyapp.repository.UserRepository
@@ -18,30 +20,13 @@ class MainViewModel(private val storyRepository: StoryRepository, private val us
     private val _logOut = MutableLiveData<Boolean>()
     val logout: LiveData<Boolean> = _logOut
 
-    private val _stories = MutableLiveData<List<Story>>()
-    val stories: LiveData<List<Story>> = _stories
+    val stories: LiveData<PagingData<Story>> = storyRepository.getAllStories().cachedIn(viewModelScope)
 
     private val _snackbarText = MutableLiveData<String>()
     val snackbarText: LiveData<String> = _snackbarText
 
     companion object {
         private const val TAG = "MainViewModel"
-    }
-
-    fun getStories() {
-        _isLoading.postValue(true)
-
-        viewModelScope.launch(Dispatchers.Default) {
-            try {
-                val result = storyRepository.getAllStories(null, null, false)
-                _stories.postValue(result)
-                _isLoading.postValue(false)
-            } catch (e: Exception) {
-                _isLoading.postValue(false)
-                Log.e(TAG, "getStories: ${e.message}")
-                _snackbarText.postValue("Fetch List Fail")
-            }
-        }
     }
 
     fun logout() {

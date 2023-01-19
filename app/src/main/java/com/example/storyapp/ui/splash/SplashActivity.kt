@@ -1,11 +1,10 @@
 package com.example.storyapp.ui.splash
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.example.storyapp.R
 import com.example.storyapp.databinding.ActivitySplashBinding
 import com.example.storyapp.helper.ViewModelFactory
 import com.example.storyapp.ui.features.login.LoginActivity

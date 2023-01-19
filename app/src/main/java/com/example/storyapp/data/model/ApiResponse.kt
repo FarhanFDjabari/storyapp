@@ -22,9 +22,9 @@ data class StoryResponses(
     @field:SerializedName("error")
     val error: Boolean = false,
     @field:SerializedName("message")
-    val message: String = "",
+    val message: String? = null,
     @field:SerializedName("listStory")
-    val listStory: List<Story> = listOf(),
+    val listStory: List<Story>? = null,
 )
 
 data class StoryResponse(

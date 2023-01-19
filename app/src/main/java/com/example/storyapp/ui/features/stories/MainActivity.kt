@@ -1,29 +1,34 @@
 package com.example.storyapp.ui.features.stories
 
-import android.app.Activity
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.util.Pair
+import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.storyapp.R
 import com.example.storyapp.data.model.Story
 import com.example.storyapp.databinding.ActivityMainBinding
 import com.example.storyapp.helper.ViewModelFactory
+import com.example.storyapp.helper.wrapEspressoIdlingResource
 import com.example.storyapp.ui.features.login.LoginActivity
 import com.example.storyapp.ui.features.new_story.NewStoryActivity
+import com.example.storyapp.ui.features.stories.adapter.LoadingStateAdapter
 import com.example.storyapp.ui.features.stories.adapter.StoryListAdapter
 import com.example.storyapp.ui.features.stories.viewModel.MainViewModel
 import com.example.storyapp.ui.features.story_detail.StoryDetailActivity
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -33,6 +38,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        supportActionBar?.title = "Stories"
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -51,24 +57,24 @@ class MainActivity : AppCompatActivity() {
             Snackbar.make(window.decorView.rootView, it, Snackbar.LENGTH_SHORT).show()
         }
 
-        mainViewModel.stories.observe(this) {
-            setStoryList(it)
-        }
-
         mainViewModel.logout.observe(this) {
             val loginIntent = Intent(this, LoginActivity::class.java)
             startActivity(loginIntent)
             finish()
         }
 
-        mainViewModel.getStories()
+        mainViewModel.stories.observe(this) {
+            storyListAdapter.submitData(lifecycle, it)
+            setListAction()
+        }
 
         val newStoryLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == RESULT_OK) {
                 val isNewStoryUploaded = it.data?.getBooleanExtra("is_new_story_uploaded", false)
                 Log.d("MainActivity", "newStoryLauncher: $isNewStoryUploaded")
                 if (isNewStoryUploaded == true) {
-                    mainViewModel.getStories()
+                    storyListAdapter.refresh()
+                    binding.rvStoryList.smoothScrollToPosition(0)
                 }
             }
         }
@@ -99,22 +105,41 @@ class MainActivity : AppCompatActivity() {
     private fun setupRecyclerView() {
         val layoutManager = LinearLayoutManager(this)
         layoutManager.orientation = LinearLayoutManager.VERTICAL
-        binding.rvStoryList.layoutManager = layoutManager
         binding.rvStoryList.setHasFixedSize(true)
 
-        storyListAdapter = StoryListAdapter()
-        storyListAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                super.onItemRangeInserted(positionStart, itemCount)
-                binding.rvStoryList.smoothScrollToPosition(0)
-            }
-        })
+        storyListAdapter = StoryListAdapter().apply {
+            stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+            registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+                override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                    super.onItemRangeInserted(positionStart, itemCount)
+                    if (positionStart == 0) {
+                        binding.rvStoryList.smoothScrollToPosition(0)
+                    }
+                }
+            })
+        }
 
-        binding.rvStoryList.adapter = storyListAdapter
+        binding.rvStoryList.layoutManager = layoutManager
+        binding.rvStoryList.adapter = storyListAdapter.withLoadStateFooter(
+            footer = LoadingStateAdapter {
+                storyListAdapter.retry()
+            }
+        )
+        storyListAdapter.refresh()
+
+        wrapEspressoIdlingResource {
+            lifecycleScope.launch {
+                storyListAdapter.loadStateFlow.collect {
+                    binding.cpiLoading.isVisible = it.refresh is LoadState.Loading
+                    if (it.refresh is LoadState.Error) {
+                        Snackbar.make(window.decorView.rootView, "Error when load stories", Snackbar.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
     }
 
-    private fun setStoryList(list: List<Story>) {
-        storyListAdapter.submitList(list)
+    private fun setListAction() {
         storyListAdapter.setOnItemClickCallback(
             object: StoryListAdapter.OnItemClickCallback {
                 override fun onItemClicked(data: Story) {
@@ -135,4 +160,5 @@ class MainActivity : AppCompatActivity() {
             binding.rvStoryList.visibility = View.VISIBLE
         }
     }
+
 }

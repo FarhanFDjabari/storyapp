@@ -1,12 +1,12 @@
 package com.example.storyapp.repository
 
-import android.app.Application
-import android.content.Context
 import android.util.Log
-import androidx.lifecycle.asLiveData
-import com.example.storyapp.R
+import androidx.lifecycle.LiveData
+import androidx.paging.*
 import com.example.storyapp.data.model.Story
 import com.example.storyapp.data.model.request.AddStoryRequest
+import com.example.storyapp.data.services.StoryRemoteMediator
+import com.example.storyapp.data.services.local.StoryDatabase
 import com.example.storyapp.data.services.local.UserPreference
 import com.example.storyapp.data.services.remote.ApiServices
 import kotlinx.coroutines.Dispatchers
@@ -15,31 +15,20 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 
 class StoryRepository private constructor(
-    private val context: Context,
     private val apiServices: ApiServices,
-    private val pref: UserPreference
+    private val pref: UserPreference,
+    private val storyDatabase: StoryDatabase
     ) {
 
-    suspend fun getAllStories(page: Int?, size: Int?, location: Boolean?): List<Story> {
-        with(Dispatchers.IO) {
-            try {
-                val userToken = pref.getToken()
-                val bearerToken = "Bearer $userToken"
-                val locationInt = location?.compareTo(true) ?: 0
-                val response = apiServices.getAllStories(
-                    authToken = bearerToken
-                )
-
-                if (!response.isSuccessful) {
-                    throw Exception(response.body()?.message.toString())
-                }
-
-                return response.body()?.listStory ?: listOf()
-            } catch (e: Exception) {
-                Log.e(this.javaClass.simpleName, "getAllStories: ${e.message}")
-                throw Exception(e.message.toString())
+    fun getAllStories(): LiveData<PagingData<Story>> {
+        @OptIn(ExperimentalPagingApi::class)
+        return Pager(
+            config = PagingConfig(pageSize = 10),
+            remoteMediator = StoryRemoteMediator(storyDatabase, apiServices, pref),
+            pagingSourceFactory = {
+                storyDatabase.storyDao().getAllStory()
             }
-        }
+        ).liveData
     }
 
     suspend fun getStoryDetail(storyId: String): Story? {
@@ -110,10 +99,10 @@ class StoryRepository private constructor(
         @Volatile
         private var instance: StoryRepository? = null
 
-        fun getInstance(context: Context, apiServices: ApiServices, pref: UserPreference): StoryRepository {
+        fun getInstance(apiServices: ApiServices, pref: UserPreference, storyDatabase: StoryDatabase): StoryRepository {
             if (instance == null) {
                 synchronized(this) {
-                    instance = StoryRepository(context.applicationContext, apiServices, pref)
+                    instance = StoryRepository(apiServices, pref, storyDatabase)
                 }
             }
             return instance as StoryRepository

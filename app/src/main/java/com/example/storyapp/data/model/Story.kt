@@ -1,10 +1,14 @@
 package com.example.storyapp.data.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
+@Entity(tableName = "story")
 data class Story(
+
     @field:SerializedName("id")
-    val id: String = "",
+    @PrimaryKey val id: String = "",
     @field:SerializedName("name")
     val name: String = "",
     @field:SerializedName("description")

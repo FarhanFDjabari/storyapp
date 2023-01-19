@@ -6,14 +6,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.storyapp.data.model.Story
-import com.example.storyapp.data.model.request.AddStoryRequest
 import com.example.storyapp.repository.StoryRepository
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.asRequestBody
-import java.io.File
+import kotlinx.coroutines.launch
 
 class StoryDetailViewModel(private val storyRepository: StoryRepository): ViewModel() {
     private val _isLoading = MutableLiveData<Boolean>()
@@ -35,7 +30,7 @@ class StoryDetailViewModel(private val storyRepository: StoryRepository): ViewMo
         viewModelScope.launch(Dispatchers.Default) {
             try {
                 val result = storyRepository.getStoryDetail(storyId = id)
-                _storyData.postValue(result)
+                result?.let { _storyData.postValue(it) }
                 _isLoading.postValue(false)
             } catch (e: Exception) {
                 _isLoading.postValue(false)

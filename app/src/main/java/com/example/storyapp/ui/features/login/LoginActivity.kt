@@ -7,10 +7,8 @@ import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
-import android.view.Gravity
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.ViewModelProvider
 import com.example.storyapp.R
 import com.example.storyapp.databinding.ActivityLoginBinding
@@ -18,7 +16,6 @@ import com.example.storyapp.helper.ViewModelFactory
 import com.example.storyapp.ui.features.login.viewModel.LoginViewModel
 import com.example.storyapp.ui.features.register.RegisterActivity
 import com.example.storyapp.ui.features.stories.MainActivity
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.progressindicator.CircularProgressIndicatorSpec
 import com.google.android.material.progressindicator.IndeterminateDrawable
 import com.google.android.material.snackbar.Snackbar

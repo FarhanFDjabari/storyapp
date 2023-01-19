@@ -2,12 +2,12 @@ package com.example.storyapp.ui.features.register
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.storyapp.R
 import com.example.storyapp.databinding.ActivityRegisterBinding

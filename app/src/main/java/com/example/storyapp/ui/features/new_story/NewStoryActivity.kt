@@ -5,13 +5,13 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -50,7 +50,7 @@ class NewStoryActivity : AppCompatActivity() {
             if (!allPermissionsGranted()) {
                 Toast.makeText(
                     this,
-                    "Permission not granted.",
+                    "Permission not granted",
                     Toast.LENGTH_SHORT
                 ).show()
                 finish()
@@ -203,6 +203,13 @@ class NewStoryActivity : AppCompatActivity() {
             binding.btnUpload.isEnabled = true
             binding.btnUpload.icon = null
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (selectedPhoto != null) binding.ivThumbnailPreview.setImageURI(Uri.fromFile(selectedPhoto))
+//        if (latLng != null) binding.tvLocation.text =
+//            getString(R.string.latlon_format, latLng!!.latitude, latLng!!.longitude)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

@@ -6,8 +6,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.storyapp.repository.UserRepository
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class RegisterViewModel(private val userRepository: UserRepository): ViewModel() {
     private val _isLoading = MutableLiveData<Boolean>()

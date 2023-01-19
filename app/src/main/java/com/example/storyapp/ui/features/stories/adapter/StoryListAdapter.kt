@@ -1,19 +1,16 @@
 package com.example.storyapp.ui.features.stories.adapter
 
-import android.app.Activity
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.app.ActivityOptionsCompat
-import androidx.core.util.Pair
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.storyapp.R
 import com.example.storyapp.data.model.Story
 import com.example.storyapp.databinding.StoryItemBinding
 
-class StoryListAdapter : ListAdapter<Story, StoryListAdapter.ListViewHolder>(ITEM_CALLBACK) {
+class StoryListAdapter : PagingDataAdapter<Story, StoryListAdapter.ListViewHolder>(ITEM_CALLBACK) {
     private lateinit var onItemClickCallback: OnItemClickCallback
 
     fun setOnItemClickCallback(onItemClickCallback: OnItemClickCallback) {
@@ -33,22 +30,24 @@ class StoryListAdapter : ListAdapter<Story, StoryListAdapter.ListViewHolder>(ITE
         val storyData = getItem(position)
 
         with(holder.binding) {
-            tvDescription.text = storyData.description
-            tvUsername.text = storyData.name
+            tvDescription.text = storyData?.description
+            tvUsername.text = storyData?.name
 
             Glide.with(holder.itemView.context)
-                .load(storyData.photoUrl)
+                .load(storyData?.photoUrl)
                 .encodeQuality(75)
                 .placeholder(R.drawable.baseline_image_24)
                 .into(ivThumbnail)
         }
 
         holder.itemView.setOnClickListener {
-            onItemClickCallback.onItemClicked(storyData)
+            if (storyData != null) {
+                onItemClickCallback.onItemClicked(storyData)
+            }
         }
     }
 
-    inner class ListViewHolder(var binding: StoryItemBinding): RecyclerView.ViewHolder(binding.root)
+    inner class ListViewHolder(var binding: StoryItemBinding) : RecyclerView.ViewHolder(binding.root)
 
     companion object {
         val ITEM_CALLBACK: DiffUtil.ItemCallback<Story> =
