@@ -2,7 +2,6 @@ package com.example.storyapp.ui.features.stories
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -35,6 +34,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var mainViewModel: MainViewModel
     private lateinit var storyListAdapter: StoryListAdapter
+    private var isNewStoryUploaded: Boolean? = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,8 +70,7 @@ class MainActivity : AppCompatActivity() {
 
         val newStoryLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == RESULT_OK) {
-                val isNewStoryUploaded = it.data?.getBooleanExtra("is_new_story_uploaded", false)
-                Log.d("MainActivity", "newStoryLauncher: $isNewStoryUploaded")
+                isNewStoryUploaded = it.data?.getBooleanExtra("is_new_story_uploaded", false)
                 if (isNewStoryUploaded == true) {
                     storyListAdapter.refresh()
                     binding.rvStoryList.smoothScrollToPosition(0)

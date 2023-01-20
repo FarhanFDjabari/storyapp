@@ -66,7 +66,9 @@ class StoryRemoteMediator(
                         name = it.name,
                         createdAt = it.createdAt,
                         photoUrl = it.photoUrl,
-                        description = it.description
+                        description = it.description,
+                        lat = null,
+                        lon = null
                     )
                 )
             }

@@ -30,7 +30,7 @@ class StoryDetailActivity : AppCompatActivity() {
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
         val factory = ViewModelFactory.getInstance(application)
-        storyId = intent.getStringExtra("story_id")
+        storyId = intent.getStringExtra(getString(R.string.intent_key_story_id))
 
         detailViewModel = ViewModelProvider(this, factory)[StoryDetailViewModel::class.java]
 

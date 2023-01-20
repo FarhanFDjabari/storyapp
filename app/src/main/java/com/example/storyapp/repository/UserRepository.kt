@@ -1,6 +1,5 @@
 package com.example.storyapp.repository
 
-import android.util.Log
 import com.example.storyapp.data.model.request.LoginRequest
 import com.example.storyapp.data.model.request.RegisterRequest
 import com.example.storyapp.data.services.local.UserPreference
@@ -22,7 +21,6 @@ class UserRepository private constructor(
                 val response = apiServices.login(request)
 
                 if (!response.isSuccessful) {
-                    Log.e(this.javaClass.simpleName, "login: ${response.body()?.message}")
                     throw Exception(response.body()?.message.toString())
                 } else {
 
@@ -31,7 +29,6 @@ class UserRepository private constructor(
                     return pref.getToken()
                 }
             } catch (e: Exception) {
-                Log.e(this.javaClass.simpleName, "login: ${e.message}")
                 throw Exception(e.message.toString())
             }
         }
@@ -43,7 +40,6 @@ class UserRepository private constructor(
                 val userToken = pref.getToken()
                 return userToken
             } catch (e: Exception) {
-                Log.e(this.javaClass.simpleName, "login: ${e.message}")
                 throw Exception(e.message.toString())
             }
         }
@@ -66,7 +62,6 @@ class UserRepository private constructor(
                 }
 
             } catch (e: Throwable) {
-                Log.e(this.javaClass.simpleName, "register: ${e.message}")
                 throw Exception(e.message.toString())
             }
         }
@@ -78,7 +73,6 @@ class UserRepository private constructor(
                 pref.updateToken(token = null)
                 return true
             } catch (e: Throwable) {
-                Log.e(this.javaClass.simpleName, "register: ${e.message}")
                 throw Exception(e.message.toString())
             }
         }

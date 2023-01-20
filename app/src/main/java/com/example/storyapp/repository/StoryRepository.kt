@@ -10,6 +10,7 @@ import com.example.storyapp.data.services.local.StoryDatabase
 import com.example.storyapp.data.services.local.UserPreference
 import com.example.storyapp.data.services.remote.ApiServices
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -31,6 +32,41 @@ class StoryRepository private constructor(
         ).liveData
     }
 
+    suspend fun getAllStoriesMap(): List<Story> {
+        val stories = mutableListOf<Story>()
+        withContext(Dispatchers.IO) {
+            try {
+                val userToken = pref.getToken()
+                val bearerToken = "Bearer $userToken"
+                val response = apiServices.getAllStories(
+                    authToken = bearerToken,
+                    page = 1,
+                    size = 100,
+                    location = 1
+                )
+                if (response.isSuccessful) {
+                    response.body()?.listStory?.forEach {
+                        stories.add(
+                            Story(
+                                id = it.id,
+                                name = it.name,
+                                description = it.description,
+                                photoUrl = it.photoUrl,
+                                createdAt = it.createdAt,
+                                lat = it.lat,
+                                lon = it.lon
+                            )
+                        )
+
+                    }
+                }
+            } catch (e: Throwable) {
+                throw Exception(e.message.toString())
+            }
+        }
+        return stories
+    }
+
     suspend fun getStoryDetail(storyId: String): Story? {
         try {
             val userToken = pref.getToken()
@@ -48,8 +84,8 @@ class StoryRepository private constructor(
         }
     }
 
-    suspend fun addNewStory(storyData: AddStoryRequest, photoPart: MultipartBody.Part): Boolean {
-        with(Dispatchers.IO) {
+    suspend fun addNewStory(storyData: AddStoryRequest, photoPart: MultipartBody.Part): Boolean =
+        withContext(Dispatchers.IO) {
             try {
                 val userToken = pref.getToken()
                 val bearerToken = "Bearer $userToken"
@@ -58,6 +94,8 @@ class StoryRepository private constructor(
                     authToken = bearerToken,
                     description = descriptionRequest,
                     file = photoPart,
+                    latitude = storyData.lat,
+                    longitude = storyData.lon
                 )
 
                 if (!response.isSuccessful) {
@@ -65,13 +103,13 @@ class StoryRepository private constructor(
                     throw Exception(response.body()?.message.toString())
                 }
 
-                return response.body()?.error == false
+                return@withContext response.body()?.error == false
             } catch (e: Throwable) {
                 Log.e(this@StoryRepository.javaClass.simpleName, "addNewStory: ${e.message}")
                 throw Exception(e.message.toString())
             }
         }
-    }
+
 
     suspend fun addNewStoryAsGuest(storyData: AddStoryRequest, photoPart: MultipartBody.Part): Boolean {
         with(Dispatchers.IO) {

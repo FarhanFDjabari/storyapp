@@ -23,9 +23,9 @@ class StoryEmailEditText: AppCompatEditText {
     private fun init() {
         addTextChangedListener {
             if (it.isNullOrEmpty()) {
-                error = "Email must not be empty"
+                error = resources.getString(R.string.empty_email_error)
             } else if (!it.contains('@')) {
-                error = "Email is not valid"
+                error = resources.getString(R.string.not_valid_email_error)
             }
         }
     }

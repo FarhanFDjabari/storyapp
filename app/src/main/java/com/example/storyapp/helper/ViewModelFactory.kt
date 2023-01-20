@@ -7,6 +7,7 @@ import com.example.storyapp.di.Injection
 import com.example.storyapp.repository.StoryRepository
 import com.example.storyapp.repository.UserRepository
 import com.example.storyapp.ui.features.login.viewModel.LoginViewModel
+import com.example.storyapp.ui.features.maps.viewModel.MapsViewModel
 import com.example.storyapp.ui.features.new_story.viewModel.NewStoryViewModel
 import com.example.storyapp.ui.features.register.viewModel.RegisterViewModel
 import com.example.storyapp.ui.features.stories.viewModel.MainViewModel
@@ -50,6 +51,8 @@ class ViewModelFactory(
             return StoryDetailViewModel(storyRepository) as T
         } else if (modelClass.isAssignableFrom(SplashViewModel::class.java)) {
             return SplashViewModel(userRepository) as T
+        } else if (modelClass.isAssignableFrom(MapsViewModel::class.java)) {
+            return MapsViewModel(storyRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class: " + modelClass.name)
     }

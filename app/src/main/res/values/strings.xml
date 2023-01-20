@@ -22,4 +22,16 @@
     <string name="tooltip_add_new_story">Add New Story</string>
     <string name="logout">Logout</string>
     <string name="retry">Retry</string>
+    <string name="empty_string_error">Password must not be empty</string>
+    <string name="less_character_password_error">Password must be 8 characters long</string>
+    <string name="empty_email_error">Email must not be empty</string>
+    <string name="not_valid_email_error">Email is not valid</string>
+    <string name="title_activity_maps">MapsActivity</string>
+    <string name="intent_key_story_id">story_id</string>
+    <string name="btn_view_detail">View Detail</string>
+    <string name="btn_pick_location">Pick Location</string>
+    <string name="intent_key_location">location_lat_lon</string>
+    <string name="intent_key_address">location_address_name</string>
+    <string name="label_location">Location</string>
+    <string name="hint_location">Pick Location From Map</string>
 </resources>

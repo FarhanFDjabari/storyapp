@@ -20,7 +20,9 @@ import com.example.storyapp.databinding.ActivityNewStoryBinding
 import com.example.storyapp.helper.ViewModelFactory
 import com.example.storyapp.helper.createCustomTempFile
 import com.example.storyapp.helper.uriToFile
+import com.example.storyapp.ui.features.maps.MapsActivity
 import com.example.storyapp.ui.features.new_story.viewModel.NewStoryViewModel
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.R
 import com.google.android.material.progressindicator.CircularProgressIndicatorSpec
 import com.google.android.material.progressindicator.IndeterminateDrawable
@@ -34,6 +36,7 @@ class NewStoryActivity : AppCompatActivity() {
     private var selectedPhoto: File? = null
     private var selectedPhotoPath: String? = null
     private var isNewStoryUploaded: Boolean = false
+    private var selectedLocationCoordinate: LatLng? = null
 
     companion object {
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
@@ -111,8 +114,23 @@ class NewStoryActivity : AppCompatActivity() {
             startGallery()
         }
 
+        binding.etLocation.setOnClickListener {
+            pickLocationLauncher.launch(Intent(this, MapsActivity::class.java))
+        }
+
         this.onBackPressedDispatcher.addCallback(this, backPressedCallback)
 
+    }
+
+    private val pickLocationLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        if (it.resultCode == RESULT_OK) {
+            val locationDataMarker = it.data?.extras?.getParcelable(getString(com.example.storyapp.R.string.intent_key_location)) as LatLng?
+            val locationAddress = it.data?.extras?.getString(getString(com.example.storyapp.R.string.intent_key_address))
+            if (locationDataMarker != null) {
+                selectedLocationCoordinate = locationDataMarker
+                binding.etLocation.setText(locationAddress)
+            }
+        }
     }
 
     private val launcherIntentGallery = registerForActivityResult(
@@ -173,8 +191,8 @@ class NewStoryActivity : AppCompatActivity() {
                 newStoryViewModel.addNewStory(
                     description = etDescription.text?.trim().toString(),
                     photo = selectedPhoto!!,
-                    lat = null,
-                    lon = null,
+                    lat = selectedLocationCoordinate?.latitude?.toFloat(),
+                    lon = selectedLocationCoordinate?.longitude?.toFloat(),
                 )
             } else {
                 etDescription.error = "Description or image should not empty"

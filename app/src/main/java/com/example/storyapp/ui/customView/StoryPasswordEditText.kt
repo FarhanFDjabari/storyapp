@@ -35,9 +35,9 @@ class StoryPasswordEditText: AppCompatEditText, View.OnTouchListener {
         layoutDirection = View.LAYOUT_DIRECTION_LTR
         addTextChangedListener {
             if (it.isNullOrEmpty()) {
-                setError("Password must not be empty", null)
+                setError(resources.getString(R.string.empty_string_error), null)
             } else if (it.length < 8) {
-                setError("Password must be 8 characters long", null)
+                setError(resources.getString(R.string.less_character_password_error), null)
             }
         }
         setOnTouchListener(this)
