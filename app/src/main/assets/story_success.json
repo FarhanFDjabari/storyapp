@@ -1,0 +1,96 @@
+{
+  "error": false,
+  "message": "Stories fetched successfully",
+  "listStory": [
+    {
+      "id": "story-m55xlB5eaMXQtijF",
+      "name": "zaki",
+      "description": "Ini adalah deksripsi gambar",
+      "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1650094349015_n1AEwJK6.jpg",
+      "createdAt": "2022-04-16T07:32:29.017Z",
+      "lat": null,
+      "lon": null
+    },
+    {
+      "id": "story-471R1SbgCjY-2la5",
+      "name": "zaka",
+      "description": "Ini adalah deksripsi gambar",
+      "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1650094335761_Kd2B0rL3.jpg",
+      "createdAt": "2022-04-16T07:32:15.763Z",
+      "lat": null,
+      "lon": null
+    },
+    {
+      "id": "story-9yjQHWH1ncnxiE1_",
+      "name": "VIVIZ",
+      "description": "makan siang gais",
+      "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1650094297763_QASDddeQ.jpg",
+      "createdAt": "2022-04-16T07:31:37.766Z",
+      "lat": null,
+      "lon": null
+    },
+    {
+      "id": "story-VPguxXuy5i-5oFIq",
+      "name": "Bachira",
+      "description": "Golden hour",
+      "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1650094177098_1YMsx5n8.jpg",
+      "createdAt": "2022-04-16T07:29:37.100Z",
+      "lat": null,
+      "lon": null
+    },
+    {
+      "id": "story-1smWy4qUpIyNO9J4",
+      "name": "John Champion",
+      "description": "popodfsd fsd nifjnsdi fnsdi fnis ndifns ijfnisjd nfijsn ijfnisd fnijsdn ifjsdn ifj nsdijfn s",
+      "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1650093839999_zoe4ilNc.jpg",
+      "createdAt": "2022-04-16T07:24:00.004Z",
+      "lat": null,
+      "lon": null
+    },
+    {
+      "id": "story-h4YjJffWzaSBlIRB",
+      "name": "John Champion",
+      "description": "we",
+      "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1650093807363_JcaCc8XA.jpg",
+      "createdAt": "2022-04-16T07:23:27.364Z",
+      "lat": null,
+      "lon": null
+    },
+    {
+      "id": "story-g9FBJtroDBE8ln2U",
+      "name": "Guest",
+      "description": "Ini adalah deksripsi gambar",
+      "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1650093730555_Zh-sCfT3.jpg",
+      "createdAt": "2022-04-16T07:22:10.556Z",
+      "lat": null,
+      "lon": null
+    },
+    {
+      "id": "story-ISze-vj6AcmqdJQh",
+      "name": "kitagawa",
+      "description": "errand",
+      "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1650093578590_0O4LhTk-.jpg",
+      "createdAt": "2022-04-16T07:19:38.591Z",
+      "lat": null,
+      "lon": null
+    },
+    {
+      "id": "story-7kpBgAv1asZFzKxW",
+      "name": "rafatar",
+      "description": "Siang",
+      "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1650093397052_9MayM7UR.jpg",
+      "createdAt": "2022-04-16T07:16:37.055Z",
+      "lat": null,
+      "lon": null
+    },
+    {
+      "id": "story-9FkV6yYMkt2M1yAF",
+      "name": "cia",
+      "description": "siu",
+      "photoUrl": "https://story-api.dicoding.dev/images/stories/photos-1650093262608_rqZQZuLM.jpg",
+      "createdAt": "2022-04-16T07:14:22.609Z",
+      "lat": null,
+      "lon": null
+    }
+  ]
+}

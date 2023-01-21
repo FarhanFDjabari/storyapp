@@ -5,13 +5,13 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.location.Geocoder
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
@@ -21,17 +21,13 @@ import com.example.storyapp.databinding.ActivityMapsBinding
 import com.example.storyapp.helper.ViewModelFactory
 import com.example.storyapp.ui.features.maps.viewModel.MapsViewModel
 import com.example.storyapp.ui.features.story_detail.StoryDetailActivity
-
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
-import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import com.google.android.material.snackbar.Snackbar
 import okio.IOException
 import java.util.*
@@ -43,16 +39,28 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityMapsBinding
     private var selectedStoryId: String? = null
     private var selectedMark: Marker? = null
+    private var prevSelectedMark: Marker? = null
     private val boundsBuilder = LatLngBounds.Builder()
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private var isPickLocation: Boolean = false
+    private val initialMarker: MutableList<LatLng> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         supportActionBar?.title = "Stories Map"
-        supportActionBar?.subtitle = "Pick location from map"
 
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        isPickLocation = intent.getBooleanExtra(
+            getString(R.string.extra_is_pick_location),
+            false
+        )
+
+        if (isPickLocation) {
+            supportActionBar?.subtitle = "Pick location from map"
+        }
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
@@ -69,22 +77,25 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         mMap.uiSettings.isCompassEnabled = true
         mMap.uiSettings.isZoomControlsEnabled = true
 
         mMap.setOnMapClickListener {
             selectedStoryId = null
-            selectedMark = null
             binding.btnViewDetail.isVisible = false
             binding.btnPickLocation.isVisible = false
         }
 
         mMap.setOnMarkerClickListener {
             it.showInfoWindow()
-            selectedMark = it
             selectedStoryId = it.tag.toString()
-            binding.btnPickLocation.isVisible = true
+            prevSelectedMark = selectedMark
+            selectedMark = it
+            if (isPickLocation) {
+                binding.btnPickLocation.isVisible = true
+            }
             binding.btnViewDetail.isVisible = true
             if (selectedStoryId.isNullOrEmpty() || selectedStoryId == "null") {
                 binding.btnViewDetail.visibility = View.INVISIBLE
@@ -92,18 +103,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             return@setOnMarkerClickListener true
         }
 
-        mMap.setOnMapLongClickListener {
-            selectedMark?.remove()
-            binding.btnPickLocation.isVisible = true
-            selectedMark = mMap.addMarker(
-                MarkerOptions()
-                    .position(it)
-                    .title("New Location")
-                    .snippet(getAddress(it.latitude, it.longitude))
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-            )
-            selectedMark?.showInfoWindow()
-            binding.btnViewDetail.visibility = View.INVISIBLE
+        if (isPickLocation) {
+            mMap.setOnMapLongClickListener {
+                addNewMarker(it)
+                binding.btnPickLocation.isVisible = true
+                binding.btnViewDetail.visibility = View.INVISIBLE
+            }
         }
 
         setMapStyle()
@@ -119,8 +124,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mapsViewModel.stories.observe(this) { stories ->
             if (stories.isNotEmpty()) {
                 addMarkers(stories)
-            } else {
-                getUserLocation()
             }
         }
 
@@ -135,14 +138,24 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         binding.btnPickLocation.setOnClickListener {
             backPressedCallback.handleOnBackPressed()
         }
+
+        getUserLocation()
     }
 
     private val requestPermissionLauncher =
         registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted: Boolean ->
-            if (isGranted) {
-                getUserLocation()
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissions ->
+            when {
+                permissions[Manifest.permission.ACCESS_FINE_LOCATION]?: false -> {
+                    getUserLocation()
+                }
+                permissions[Manifest.permission.ACCESS_COARSE_LOCATION]?: false -> {
+                    getUserLocation()
+                }
+                else -> {
+                    // when permissions denied
+                }
             }
         }
 
@@ -150,6 +163,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         stories.forEach {
             if (it.lat != null && it.lon != null) {
                 val coor = LatLng(it.lat, it.lon)
+                initialMarker.add(coor)
                 mMap.addMarker(MarkerOptions().position(coor).title(it.name).snippet(it.description))
                     ?.tag = it.id
                 boundsBuilder.include(coor)
@@ -164,6 +178,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             resources.displayMetrics.heightPixels,
             300
         ))
+    }
+
+    private fun addNewMarker(latLng: LatLng) {
+        if (initialMarker.contains(selectedMark?.position)) {
+            prevSelectedMark?.remove()
+        } else {
+            selectedMark?.remove()
+        }
+        selectedMark = mMap.addMarker(
+            MarkerOptions()
+                .position(latLng)
+                .title("Your Location")
+                .snippet(getAddress(latLng.latitude, latLng.longitude))
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+        )
+        selectedMark?.showInfoWindow()
     }
 
     private fun setMapStyle() {
@@ -195,14 +225,42 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun getUserLocation() {
-        if (ContextCompat.checkSelfPermission(
-                this.applicationContext,
-                Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED) {
+        if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+            && checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION)) {
             mMap.isMyLocationEnabled = true
+            fusedLocationClient.lastLocation.addOnSuccessListener {
+                if (it != null) {
+                    val latLng = LatLng(it.latitude, it.longitude)
+                    if (isPickLocation) {
+
+                        addNewMarker(latLng)
+                        mMap.animateCamera(
+                            CameraUpdateFactory.newLatLngZoom(latLng, 17f)
+                        )
+                    }
+                } else {
+                    Toast.makeText(
+                        this,
+                        "Last location is not found",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
         } else {
-            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            requestPermissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
         }
+    }
+
+    private fun checkPermission(permission: String): Boolean {
+        return ContextCompat.checkSelfPermission(
+            this,
+            permission
+        ) == PackageManager.PERMISSION_GRANTED
     }
 
     private fun loadingState(isLoading: Boolean) {
@@ -217,7 +275,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         override fun handleOnBackPressed() {
             intent.putExtras(
                 Bundle().apply {
-                    putParcelable(getString(R.string.intent_key_location), selectedMark?.position)
+                    putParcelable(
+                        getString(R.string.intent_key_location),
+                        selectedMark?.position
+                    )
                     putString(
                         getString(R.string.intent_key_address),
                         getAddress(
@@ -233,8 +294,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-            backPressedCallback.handleOnBackPressed()
+        when(item.itemId) {
+            android.R.id.home -> {
+                backPressedCallback.handleOnBackPressed()
+            }
         }
         return super.onOptionsItemSelected(item)
     }

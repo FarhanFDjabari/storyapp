@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
@@ -29,6 +30,7 @@ import com.google.android.material.progressindicator.IndeterminateDrawable
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
 
+
 class NewStoryActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityNewStoryBinding
@@ -37,6 +39,7 @@ class NewStoryActivity : AppCompatActivity() {
     private var selectedPhotoPath: String? = null
     private var isNewStoryUploaded: Boolean = false
     private var selectedLocationCoordinate: LatLng? = null
+    private var isProvideLocation: Boolean = false
 
     companion object {
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
@@ -114,8 +117,22 @@ class NewStoryActivity : AppCompatActivity() {
             startGallery()
         }
 
+        binding.cbIncludeLocation.setOnClickListener {
+            isProvideLocation = !isProvideLocation
+            binding.cbIncludeLocation.isChecked = isProvideLocation
+            if (isProvideLocation) {
+                binding.etLocation.visibility = View.VISIBLE
+            } else {
+                selectedLocationCoordinate = null
+                binding.etLocation.text = null
+                binding.etLocation.visibility = View.GONE
+            }
+        }
+
         binding.etLocation.setOnClickListener {
-            pickLocationLauncher.launch(Intent(this, MapsActivity::class.java))
+            val pickLocationIntent = Intent(this, MapsActivity::class.java)
+            pickLocationIntent.putExtra(getString(com.example.storyapp.R.string.extra_is_pick_location), true)
+            pickLocationLauncher.launch(pickLocationIntent)
         }
 
         this.onBackPressedDispatcher.addCallback(this, backPressedCallback)
@@ -155,7 +172,7 @@ class NewStoryActivity : AppCompatActivity() {
 
     private val backPressedCallback = object: OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            intent.putExtra("is_new_story_uploaded", isNewStoryUploaded)
+            intent.putExtra(getString(com.example.storyapp.R.string.is_new_story_uploaded), isNewStoryUploaded)
             setResult(RESULT_OK, intent)
             finish()
         }

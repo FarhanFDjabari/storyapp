@@ -21,6 +21,7 @@ import com.example.storyapp.databinding.ActivityMainBinding
 import com.example.storyapp.helper.ViewModelFactory
 import com.example.storyapp.helper.wrapEspressoIdlingResource
 import com.example.storyapp.ui.features.login.LoginActivity
+import com.example.storyapp.ui.features.maps.MapsActivity
 import com.example.storyapp.ui.features.new_story.NewStoryActivity
 import com.example.storyapp.ui.features.stories.adapter.LoadingStateAdapter
 import com.example.storyapp.ui.features.stories.adapter.StoryListAdapter
@@ -70,7 +71,10 @@ class MainActivity : AppCompatActivity() {
 
         val newStoryLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == RESULT_OK) {
-                isNewStoryUploaded = it.data?.getBooleanExtra("is_new_story_uploaded", false)
+                isNewStoryUploaded = it.data?.getBooleanExtra(
+                    getString(R.string.is_new_story_uploaded),
+                    false
+                )
                 if (isNewStoryUploaded == true) {
                     storyListAdapter.refresh()
                     binding.rvStoryList.smoothScrollToPosition(0)
@@ -95,8 +99,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.item_logout) {
-            mainViewModel.logout()
+        when(item.itemId) {
+            R.id.item_logout -> {
+                mainViewModel.logout()
+            }
+            R.id.item_map_view -> {
+                startActivity(Intent(this, MapsActivity::class.java))
+            }
         }
         return super.onOptionsItemSelected(item)
     }
@@ -143,7 +152,7 @@ class MainActivity : AppCompatActivity() {
             object: StoryListAdapter.OnItemClickCallback {
                 override fun onItemClicked(data: Story) {
                     val detailIntent = Intent(this@MainActivity, StoryDetailActivity::class.java)
-                    detailIntent.putExtra("story_id", data.id)
+                    detailIntent.putExtra(getString(R.string.intent_key_story_id), data.id)
                     startActivity(detailIntent)
                 }
             }

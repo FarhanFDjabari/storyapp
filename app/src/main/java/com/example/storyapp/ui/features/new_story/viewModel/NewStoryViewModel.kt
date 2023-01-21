@@ -1,6 +1,5 @@
 package com.example.storyapp.ui.features.new_story.viewModel
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -52,7 +51,6 @@ class NewStoryViewModel(private val storyRepository: StoryRepository): ViewModel
                 }
             } catch (e: Exception) {
                 _isLoading.postValue(false)
-                Log.e(TAG, "addNewStory: ${e.message}")
                 _snackbarText.postValue("${e.message}")
             }
         }

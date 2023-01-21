@@ -33,4 +33,8 @@
     <string name="intent_key_address">location_address_name</string>
     <string name="label_location">Location</string>
     <string name="hint_location">Pick Location From Map</string>
+    <string name="map_view">View Map</string>
+    <string name="use_location">Use Location</string>
+    <string name="extra_is_pick_location">is_pick_location</string>
+    <string name="is_new_story_uploaded">is_new_story_uploaded</string>
 </resources>
