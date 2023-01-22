@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.storyapp.databinding.ActivityNewStoryBinding
 import com.example.storyapp.helper.ViewModelFactory
 import com.example.storyapp.helper.createCustomTempFile
+import com.example.storyapp.helper.reduceFileImage
 import com.example.storyapp.helper.uriToFile
 import com.example.storyapp.ui.features.maps.MapsActivity
 import com.example.storyapp.ui.features.new_story.viewModel.NewStoryViewModel
@@ -205,9 +206,10 @@ class NewStoryActivity : AppCompatActivity() {
     private fun uploadData() {
         with(binding) {
             if (!etDescription.text.isNullOrEmpty() && selectedPhoto != null) {
+                val reducedImage = reduceFileImage(selectedPhoto!!)
                 newStoryViewModel.addNewStory(
                     description = etDescription.text?.trim().toString(),
-                    photo = selectedPhoto!!,
+                    photo = reducedImage,
                     lat = selectedLocationCoordinate?.latitude?.toFloat(),
                     lon = selectedLocationCoordinate?.longitude?.toFloat(),
                 )
